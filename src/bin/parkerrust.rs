@@ -134,7 +134,6 @@ fn findwords(
 }
 
 fn output(index_to_word: &[&[u8]], words: &[usize; 5]) {
-    // return;
     let str = format!(
         "{} {} {} {} {}",
         unsafe { std::str::from_utf8_unchecked(index_to_word[words[0]]) },
