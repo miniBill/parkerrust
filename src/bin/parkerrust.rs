@@ -79,8 +79,8 @@ fn findwords(
                     if totalbits & w != 0 {
                         0usize
                     } else {
-                        let idx: usize = bits_to_index[&w];
-                        let mut newwords: [usize; 5] = words.clone();
+                        let idx: usize = bits_to_index[w];
+                        let mut newwords: [usize; 5] = *words;
                         newwords[numwords] = idx;
                         findwords(
                             lettermask,
@@ -96,40 +96,38 @@ fn findwords(
                     }
                 })
                 .sum::<usize>()
-        } else {
-            if numwords == 4 && skipped >= 0 {
-                let candidate = !(totalbits | lettermask[skipped as usize]) & 0x3FFFFFF;
-                if let Some(last_index) = bits_to_index.get(&candidate) {
-                    words[numwords] = *last_index;
+        } else if numwords == 4 && skipped >= 0 {
+            let candidate = !(totalbits | lettermask[skipped as usize]) & 0x3FFFFFF;
+            if let Some(last_index) = bits_to_index.get(&candidate) {
+                words[numwords] = *last_index;
 
+                output(index_to_word, words);
+                numsolutions += 1
+            }
+        } else {
+            for w in letter_to_words_bits[i].iter() {
+                if totalbits & w != 0 {
+                    continue;
+                }
+
+                let idx: usize = bits_to_index[w];
+                words[numwords] = idx;
+
+                if numwords == 4 {
                     output(index_to_word, words);
                     numsolutions += 1
-                }
-            } else {
-                for w in letter_to_words_bits[i].iter() {
-                    if totalbits & w != 0 {
-                        continue;
-                    }
-
-                    let idx: usize = bits_to_index[&w];
-                    words[numwords] = idx;
-
-                    if numwords == 4 {
-                        output(index_to_word, words);
-                        numsolutions += 1
-                    } else {
-                        numsolutions += findwords(
-                            lettermask,
-                            letter_to_words_bits,
-                            bits_to_index,
-                            index_to_word,
-                            totalbits | w,
-                            numwords + 1,
-                            words,
-                            i + 1,
-                            skipped,
-                        )
-                    }
+                } else {
+                    numsolutions += findwords(
+                        lettermask,
+                        letter_to_words_bits,
+                        bits_to_index,
+                        index_to_word,
+                        totalbits | w,
+                        numwords + 1,
+                        words,
+                        i + 1,
+                        skipped,
+                    )
                 }
             }
         }
@@ -143,8 +141,7 @@ fn findwords(
     numsolutions
 }
 
-fn output(index_to_word: &Vec<&[u8]>, words: &[usize; 5]) -> () {
-    // return;
+fn output(index_to_word: &[&[u8]], words: &[usize; 5]) {
     let str = format!(
         "{} {} {} {} {}",
         unsafe { std::str::from_utf8_unchecked(index_to_word[words[0]]) },

@@ -29,7 +29,7 @@ pub fn readwords<'a>(
         let char = *char;
         // _technically_ this loop will not work for the last word
         // In practice the last word has a duplicate letter so we don't care
-        if char != '\n' as u8 {
+        if char != b'\n' {
             bits |= 1 << (char as u32 - 'a' as u32);
             continue;
         }
@@ -73,7 +73,7 @@ pub fn readwords<'a>(
     let mut reverseletterorder: [usize; 26] = [0; 26];
 
     for i in 0..26 {
-        lettermask[i] = (1 as u32) << freq[i].letter;
+        lettermask[i] = 1_u32 << freq[i].letter;
         reverseletterorder[freq[i].letter as usize] = i;
     }
 
