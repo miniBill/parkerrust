@@ -9,6 +9,14 @@ fn findwords_parallel(
     bits_to_index: &HashMap<u32, usize>,
     index_to_word: &Vec<&[u8]>,
 ) -> usize {
+    struct StartInfo {
+        totalbits: u32,
+        numwords: usize,
+        words: [usize; 5],
+        max_letter: usize,
+        skipped: i32,
+    }
+
     let mut words: [usize; 5] = [0; 5];
 
     // let (sender1, receiver1) = crossbeam::channel::unbounded::<u32>();
